@@ -1,0 +1,63 @@
+{
+  "name": "pnpm-audit-html",
+  "version": "0.1.0",
+  "description": "A tool to generate an HTML report from pnpm audit.",
+  "main": "dist/index.js",
+  "bin": {
+    "pnpm-audit-html": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint 'src/**/*.{js,ts}' --ignore-pattern '**/*.spec.ts'",
+    "format": "prettier --write 'src/**/*.{js,ts}'",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm test",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mxncson/pnpm-audit-html.git"
+  },
+  "keywords": [
+    "pnpm",
+    "audit",
+    "html",
+    "report",
+    "security",
+    "npm"
+  ],
+  "author": "Maxence Masson <maxencemasson.mm@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mxncson/pnpm-audit-html/issues"
+  },
+  "homepage": "https://github.com/mxncson/pnpm-audit-html#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/ejs": "^3.1.5",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.4.2",
+    "@typescript-eslint/eslint-plugin": "^8.2.0",
+    "@typescript-eslint/parser": "^8.2.0",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.9.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.3",
+    "ts-jest": "^29.2.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.2.0"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "ejs": "^3.1.10",
+    "marked": "^14.0.0"
+  }
+}
