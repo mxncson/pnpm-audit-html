@@ -1,0 +1,183 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.2/dist/morph/bootstrap.min.css" crossorigin="anonymous" />
+
+    <title>PNPM Audit Report</title>
+    <meta name="description" content="<%= vulnerabilities.total %> overall vulnerabilities found." />
+
+    <style>
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease-out;
+        }
+
+        .collapsible-header {
+            cursor: pointer;
+        }
+
+        .collapsible-header::after {
+            content: " ▼";
+        }
+
+        .collapsible-header.active::after {
+            content: " ▲";
+        }
+
+        .collapsible-content.active {
+            max-height: 1000px;
+        }
+
+        .vulnerability-summary {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .vulnerability-summary .badge {
+            margin-right: 10px;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .references, .reasons {
+            margin-top: 20px;
+        }
+
+        .references ul, .reasons ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .references ul li, .reasons ul li {
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .references ul li:before, .reasons ul li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row my-3">
+            <div class="col-md text-center">
+                <h1 class="h2">PNPM Audit Report</h1>
+                <h3 class="h5">
+                    <%= advisories.length %> unique from <%= vulnerabilities.total %> overall vulnerabilities | <%= dependencies.total %> dependencies
+                </h3>
+                <div class="vulnerability-summary">
+                    <a href="#critical" class="badge bg-danger">Critical: <%= vulnerabilities.critical %></a>
+                    <a href="#high" class="badge bg-warning">High: <%= vulnerabilities.high %></a>
+                    <a href="#moderate" class="badge bg-info">Moderate: <%= vulnerabilities.moderate %></a>
+                    <a href="#low" class="badge bg-success">Low: <%= vulnerabilities.low %></a>
+                    <a href="#info" class="badge bg-secondary">Info: <%= vulnerabilities.info %></a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <% advisories.forEach(function(advisory, index) {
+                advisory.findings.forEach(function(finding) { %>
+            <% if (index === 0 || (index > 0 && advisories[index-1].severity !== advisory.severity)) { %>
+            <div id="<%= advisory.severity %>" class="col-md-12"> <!-- Add an ID for the first occurrence of each severity -->
+            <% } else { %>
+            <div class="col-md-12">
+            <% } %>
+                <div class="card mb-3">
+                    <div class="card-body p-4">
+                        <h1 class="card-title h3">
+                            <span class="badge text-capitalize bg-<%= advisory.severity === 'critical' ? 'danger' : advisory.severity === 'high' ? 'warning' : advisory.severity === 'moderate' ? 'info' : 'success' %>">
+                                <%= advisory.severity %>
+                            </span>
+                            <%= advisory.title %>
+                        </h1>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li>Module: <a href="https://npmjs.com/package/<%= advisory.module_name %>" target="_blank" rel="noopener noreferrer"><%= advisory.module_name %></a></li>
+                                    <li>Installed version: <%= finding.version %></li>
+                                    <li>Vulnerable versions: <%= advisory.vulnerable_versions %></li>
+                                    <li>Patched in: <%= advisory.patched_versions %></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li>Published: <%= new Date(advisory.created).toLocaleDateString() %></li>
+                                    <% if (advisory.cves && advisory.cves.length > 0) { %>
+                                    <li>CVEs: <%= advisory.cves.join(', ') %></li>
+                                    <% } %>
+                                    <% if (advisory.cwe && advisory.cwe.length > 0) { %>
+                                    <li>CWE: <%= advisory.cwe.join(', ') %></li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Overview</h3>
+                        <div><%- advisory.overview %></div>
+
+                        <% if (advisory.recommendation) { %>
+                        <h3>Remediation</h3>
+                        <div><%- advisory.recommendation %></div>
+                        <% } %>
+
+                        <% if (advisory.references) { %>
+                        <div class="references">
+                            <h3 class="collapsible-header" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('active');">
+                                References
+                            </h3>
+                            <div class="collapsible-content">
+                                <ul>
+                                    <%- advisory.references %>
+                                </ul>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <% if (finding.paths && finding.paths.length > 0) { %>
+                        <div class="reasons">
+                            <h3 class="collapsible-header" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('active');">
+                                Reasons this module exists
+                            </h3>
+                            <div class="collapsible-content">
+                                <ul>
+                                    <% finding.paths.forEach(function(path) { %>
+                                    <li><code><%= path %></code></li>
+                                    <% }) %>
+                                </ul>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <a href="<%= advisory.url %>" class="btn btn-md btn-primary" target="_blank" rel="noopener noreferrer">
+                                More about this vulnerability
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% }); }); %>
+            <% if (advisories.length === 0) { %>
+            <div class="col-md-12 alert alert-success">Congrats!!! No vulnerabilities have been found.</div>
+            <% } %>
+
+            <h6 class="col-md-12 mb-3 pb-3 text-end">Report generated at <%= new Date().toLocaleString() %></h6>
+        </div>
+    </div>
+</body>
+</html>
