@@ -1,6 +1,6 @@
 {
   "name": "pnpm-audit-html",
-  "version": "0.1.12",
+  "version": "0.1.13-alpha",
   "description": "A tool to generate an HTML report from pnpm audit.",
   "main": "dist/index.js",
   "bin": {
