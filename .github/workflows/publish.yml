@@ -29,15 +29,6 @@ jobs:
       - name: Install dependencies with pnpm
         run: pnpm install --frozen-lockfile
 
-      - name: Create and push tag
-        id: tag_version
-        run: |
-          version=$(jq -r .version package.json)
-          git tag "v$version"
-          git push origin "v$version"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Publish to npm
         run: npm publish --access public
         env:
