@@ -131,10 +131,12 @@
 								</div>
 								<div class="col-md-6">
 									<ul>
+										<% if (advisory.created) { %>
 										<li>
 											Published: <%= new
 											Date(advisory.created).toLocaleDateString() %>
 										</li>
+										<% } %>
 										<% if (advisory.cves && advisory.cves.length > 0) { %>
 										<li>CVEs: <%= advisory.cves.join(', ') %></li>
 										<% } %> <% if (advisory.cwe && advisory.cwe.length > 0) { %>
@@ -144,8 +146,10 @@
 								</div>
 							</div>
 
+							<% if (advisory.overview) { %>
 							<h3>Overview</h3>
 							<div><%- advisory.overview %></div>
+							<% } %>
 
 							<% if (advisory.recommendation) { %>
 							<h3>Remediation</h3>
