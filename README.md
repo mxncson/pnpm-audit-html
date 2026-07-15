@@ -10,12 +10,17 @@ Generate beautiful HTML reports from your pnpm audit results. This tool provides
 - **Beautiful Reports**: Generates well-structured and visually appealing HTML reports.
 - **Customizable Output**: Choose your output file name and location.
 
+## 📋 Requirements
+
+- **pnpm**: v8.0.0 or higher
+- **Node.js**: v14.15.0 or higher
+
 ## 📦 Installation
 
 To install `pnpm-audit-html`, follow these steps:
 
 ```bash
-# Ensure you have pnpm installed
+# Ensure you have pnpm v8+ installed
 npm install -g pnpm
 
 # Install pnpm-audit-html globally
