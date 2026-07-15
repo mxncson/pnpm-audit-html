@@ -41,7 +41,7 @@ interface Advisory {
   cvss: Cvss;
   updated: string;
   recommendation: string;
-  cwe: string[];
+  cwe: string[] | string;
   found_by: unknown;
   deleted: unknown;
   id: number;
@@ -100,7 +100,16 @@ export const generateHtml = (auditData: AuditData): string => {
 
   // Parse markdown in advisories
   sortedAdvisories.forEach((advisory) => {
-    advisory.overview = marked(advisory.overview, { async: false });
+    // pnpm v11 emits `cwe` as a string; v10 emits string[]. Normalize so the template can .join().
+    if (typeof advisory.cwe === 'string') {
+      advisory.cwe = advisory.cwe
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+    if (advisory.overview) {
+      advisory.overview = marked(advisory.overview, { async: false });
+    }
     if (advisory.recommendation) {
       advisory.recommendation = marked(advisory.recommendation, {
         async: false,
