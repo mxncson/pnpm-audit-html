@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import { writeFileSync } from 'fs';
 import { generateHtml } from './htmlGenerator';
 import { Command } from 'commander';
+import { version } from '../package.json';
 
 jest.mock('child_process');
 jest.mock('fs');
@@ -93,6 +94,7 @@ describe('main', () => {
 
     main(['node', 'script.js', '--output', 'output.html']);
 
+    expect(commandMock.version).toHaveBeenCalledWith(version);
     expect(execSync).toHaveBeenCalledWith('pnpm audit --json', {
       encoding: 'utf-8',
       stdio: 'pipe',
