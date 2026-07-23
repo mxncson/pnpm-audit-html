@@ -5,6 +5,7 @@ import { Command } from 'commander';
 import { execSync, ExecSyncOptionsWithStringEncoding } from 'child_process';
 import { generateHtml } from './htmlGenerator';
 import { writeFileSync } from 'fs';
+import { version } from '../package.json';
 
 export const runPnpmAudit = (): string => {
   try {
@@ -43,7 +44,7 @@ export const main = (cliArgs: string[] = process.argv): void => {
 
   program
     .name('pnpm-audit-html')
-    .version('1.0.0')
+    .version(version)
     .description('Generate HTML report from pnpm audit')
     .option('-o, --output <file>', 'Output HTML file', 'pnpm-audit-report.html')
     .action((options) => {
