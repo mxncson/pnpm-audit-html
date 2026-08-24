@@ -7,12 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-24
+
 ### Added
 - `-v, --verbose` flag to print the full error stack on failure
 
 ### Fixed
 - **Exit with code 1 when report generation fails.** The CLI previously exited 0 on any
   failure, so CI pipelines passed silently when the audit or report generation broke.
+  **Breaking for consumers:** a pipeline whose audit was already failing goes from green
+  to red on upgrade. A successful run still exits 0 even when vulnerabilities are found.
 
 ### Changed
 - Only publish `dist/` and `templates/` to npm (`files` field). Previous releases shipped
