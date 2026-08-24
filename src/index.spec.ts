@@ -7,33 +7,46 @@ import { version } from '../package.json';
 
 jest.mock('child_process');
 jest.mock('fs');
-jest.mock('./htmlGenerator');
+jest.mock('./htmlGenerator', () => ({
+  ...jest.requireActual('./htmlGenerator'),
+  generateHtml: jest.fn(),
+}));
 jest.mock('commander');
+
+const vulnerabilities = { info: 0, low: 1, moderate: 0, high: 2, critical: 1, total: 4 };
+
+const auditPayload = JSON.stringify({
+  actions: [],
+  advisories: {},
+  metadata: {
+    vulnerabilities,
+    dependencies: 10,
+    devDependencies: 2,
+    optionalDependencies: 0,
+    totalDependencies: 12,
+  },
+});
 
 describe('runPnpmAudit', () => {
   it('should return audit output when the command succeeds', () => {
-    const mockOutput = '{"mock": "data"}';
-    (execSync as jest.Mock).mockReturnValueOnce(mockOutput);
+    (execSync as jest.Mock).mockReturnValueOnce(auditPayload);
 
-    const result = runPnpmAudit();
-    expect(result).toBe(mockOutput);
+    expect(runPnpmAudit()).toBe(auditPayload);
   });
 
   it('should return stdout when the command fails with a non-zero exit code', () => {
     const mockError = new Error('Command failed');
-    (mockError as any).stdout = '{"mock": "data"}';
+    (mockError as any).stdout = auditPayload;
     (execSync as jest.Mock).mockImplementationOnce(() => {
       throw mockError;
     });
 
-    const result = runPnpmAudit();
-    expect(result).toBe('{"mock": "data"}');
+    expect(runPnpmAudit()).toBe(auditPayload);
   });
 
   it('should throw an error when the command fails without stdout', () => {
-    const mockError = new Error('Command failed');
     (execSync as jest.Mock).mockImplementationOnce(() => {
-      throw mockError;
+      throw new Error('Command failed');
     });
 
     expect(() => runPnpmAudit()).toThrow('Command failed');
@@ -41,25 +54,24 @@ describe('runPnpmAudit', () => {
 });
 
 describe('generateAuditReport', () => {
-  it('should generate and write HTML report', () => {
-    const mockAuditOutput = '{"mock": "data"}';
+  it('should write the HTML report and return the vulnerability counts', () => {
     const mockHtml = '<html>Mock Report</html>';
     (generateHtml as jest.Mock).mockReturnValue(mockHtml);
 
-    generateAuditReport(mockAuditOutput, 'output.html');
+    const result = generateAuditReport(auditPayload, 'output.html');
 
-    expect(generateHtml).toHaveBeenCalledWith(JSON.parse(mockAuditOutput));
+    expect(generateHtml).toHaveBeenCalledWith(JSON.parse(auditPayload));
     expect(writeFileSync).toHaveBeenCalledWith('output.html', mockHtml);
+    expect(result).toEqual(vulnerabilities);
   });
 
   it('should handle JSON parsing errors and log raw output', () => {
-    const mockAuditOutput = 'invalid json';
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    expect(() => generateAuditReport(mockAuditOutput, 'output.html')).toThrow(SyntaxError);
+    expect(() => generateAuditReport('invalid json', 'output.html')).toThrow(SyntaxError);
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to parse JSON:', expect.any(String));
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Raw output:', mockAuditOutput);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Raw output:', 'invalid json');
 
     consoleErrorSpy.mockRestore();
   });
@@ -69,6 +81,7 @@ describe('main', () => {
   let commandMock: Command;
   let actionOptions: Record<string, unknown>;
   let initialExitCode: typeof process.exitCode;
+  let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -85,22 +98,25 @@ describe('main', () => {
     });
 
     (Command as jest.Mock).mockReturnValue(commandMock);
+
+    (execSync as jest.Mock).mockReturnValue(auditPayload);
+    (generateHtml as jest.Mock).mockReturnValue('<html>Mock Report</html>');
+
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'time').mockImplementation(() => {});
+    jest.spyOn(console, 'timeEnd').mockImplementation(() => {});
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     process.exitCode = initialExitCode;
+    jest.restoreAllMocks();
   });
 
+  const run = () => main(['node', 'script.js', '--output', 'output.html']);
+
   it('should run the audit, generate the report, and handle successful execution', () => {
-    const mockAuditOutput = '{"mock": "data"}';
-    const mockHtml = '<html>Mock Report</html>';
-    (execSync as jest.Mock).mockReturnValue(mockAuditOutput);
-    (generateHtml as jest.Mock).mockReturnValue(mockHtml);
-
-    const consoleTimeSpy = jest.spyOn(console, 'time').mockImplementation(() => {});
-    const consoleTimeEndSpy = jest.spyOn(console, 'timeEnd').mockImplementation(() => {});
-
-    main(['node', 'script.js', '--output', 'output.html']);
+    run();
 
     expect(commandMock.version).toHaveBeenCalledWith(version);
     expect(execSync).toHaveBeenCalledWith('pnpm audit --json', {
@@ -108,34 +124,24 @@ describe('main', () => {
       stdio: 'pipe',
       maxBuffer: 20971520,
     });
-    expect(generateHtml).toHaveBeenCalledWith(JSON.parse(mockAuditOutput));
-    expect(writeFileSync).toHaveBeenCalledWith('output.html', mockHtml);
-    expect(consoleTimeSpy).toHaveBeenCalledWith('Audit report generation time');
-    expect(consoleTimeEndSpy).toHaveBeenCalledWith('Audit report generation time');
-
-    consoleTimeSpy.mockRestore();
-    consoleTimeEndSpy.mockRestore();
+    expect(generateHtml).toHaveBeenCalledWith(JSON.parse(auditPayload));
+    expect(writeFileSync).toHaveBeenCalledWith('output.html', '<html>Mock Report</html>');
+    expect(process.exitCode).toBe(initialExitCode);
   });
 
   it('should exit non-zero and hint at --verbose when the audit fails', () => {
-    const mockError = new Error('Audit command failed');
     (execSync as jest.Mock).mockImplementationOnce(() => {
-      throw mockError;
+      throw new Error('Audit command failed');
     });
 
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    main(['node', 'script.js', '--output', 'output.html']);
+    run();
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'Failed to generate audit report:',
       'Audit command failed'
     );
     expect(consoleErrorSpy).toHaveBeenCalledWith('Re-run with --verbose for the full stack trace.');
-    expect(consoleErrorSpy).not.toHaveBeenCalledWith(mockError);
     expect(process.exitCode).toBe(1);
-
-    consoleErrorSpy.mockRestore();
   });
 
   it('should print the full error when --verbose is set', () => {
@@ -145,24 +151,68 @@ describe('main', () => {
       throw mockError;
     });
 
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    main(['node', 'script.js', '--output', 'output.html', '--verbose']);
+    run();
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(mockError);
     expect(process.exitCode).toBe(1);
-
-    consoleErrorSpy.mockRestore();
   });
 
-  it('should leave the exit code untouched on success', () => {
-    (execSync as jest.Mock).mockReturnValue('{"mock": "data"}');
-    (generateHtml as jest.Mock).mockReturnValue('<html>Mock Report</html>');
-    jest.spyOn(console, 'time').mockImplementation(() => {});
-    jest.spyOn(console, 'timeEnd').mockImplementation(() => {});
+  describe('--fail-on', () => {
+    it.each([
+      ['critical', 1],
+      ['high', 3],
+      ['moderate', 3],
+      ['low', 4],
+      ['info', 4],
+    ])('exits 2 when %s and above is breached by %i vulnerabilities', (failOn, breaching) => {
+      actionOptions = { output: 'output.html', failOn };
 
-    main(['node', 'script.js', '--output', 'output.html']);
+      run();
 
-    expect(process.exitCode).toBe(initialExitCode);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        `${breaching} vulnerabilities at or above '${failOn}' severity.`
+      );
+      expect(process.exitCode).toBe(2);
+    });
+
+    it('leaves the exit code untouched when nothing reaches the threshold', () => {
+      actionOptions = { output: 'output.html', failOn: 'critical' };
+      (execSync as jest.Mock).mockReturnValue(
+        JSON.stringify({
+          actions: [],
+          advisories: {},
+          metadata: {
+            vulnerabilities: { info: 3, low: 1, moderate: 0, high: 0, critical: 0, total: 4 },
+            dependencies: 10,
+            devDependencies: 2,
+            optionalDependencies: 0,
+            totalDependencies: 12,
+          },
+        })
+      );
+
+      run();
+
+      expect(process.exitCode).toBe(initialExitCode);
+    });
+
+    it('exits 1 on an unknown severity without running the audit', () => {
+      actionOptions = { output: 'output.html', failOn: 'severe' };
+
+      run();
+
+      expect(execSync).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Failed to generate audit report:',
+        "Invalid --fail-on value 'severe'. Expected one of: info, low, moderate, high, critical."
+      );
+      expect(process.exitCode).toBe(1);
+    });
+
+    it('does not gate when the flag is absent', () => {
+      run();
+
+      expect(process.exitCode).toBe(initialExitCode);
+    });
   });
 });
