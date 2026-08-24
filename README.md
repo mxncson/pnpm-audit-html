@@ -70,8 +70,18 @@ pnpm-audit-html --output security-report.html
 ### Available Options
 
 - `-o, --output <file>`: Specify the output HTML file (default: pnpm-audit-report.html).
+- `-v, --verbose`: Print the full error stack when report generation fails.
 - `-V, --version`: Output the version number.
 - `-h, --help`: Display help for the command.
+
+### Exit Codes
+
+- `0`: The report was generated successfully.
+- `1`: Report generation failed (audit could not run, output could not be parsed, or the
+  file could not be written). Re-run with `--verbose` to see the stack trace.
+
+Note that a successful run exits `0` even when vulnerabilities are found — the report is
+still generated. Gating a pipeline on severity is not supported yet.
 
 ## 🤝 Contributing
 

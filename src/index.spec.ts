@@ -67,9 +67,13 @@ describe('generateAuditReport', () => {
 
 describe('main', () => {
   let commandMock: Command;
+  let actionOptions: Record<string, unknown>;
+  let initialExitCode: typeof process.exitCode;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    initialExitCode = process.exitCode;
+    actionOptions = { output: 'output.html' };
     commandMock = new Command();
 
     (commandMock.name as jest.Mock).mockReturnThis();
@@ -77,10 +81,14 @@ describe('main', () => {
     (commandMock.description as jest.Mock).mockReturnThis();
     (commandMock.option as jest.Mock).mockReturnThis();
     (commandMock.action as jest.Mock).mockImplementation((callback) => {
-      callback({ output: 'output.html' });
+      callback(actionOptions);
     });
 
     (Command as jest.Mock).mockReturnValue(commandMock);
+  });
+
+  afterEach(() => {
+    process.exitCode = initialExitCode;
   });
 
   it('should run the audit, generate the report, and handle successful execution', () => {
@@ -109,7 +117,7 @@ describe('main', () => {
     consoleTimeEndSpy.mockRestore();
   });
 
-  it('should handle errors during audit execution', () => {
+  it('should exit non-zero and hint at --verbose when the audit fails', () => {
     const mockError = new Error('Audit command failed');
     (execSync as jest.Mock).mockImplementationOnce(() => {
       throw mockError;
@@ -123,8 +131,38 @@ describe('main', () => {
       'Failed to generate audit report:',
       'Audit command failed'
     );
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Full error:', mockError);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Re-run with --verbose for the full stack trace.');
+    expect(consoleErrorSpy).not.toHaveBeenCalledWith(mockError);
+    expect(process.exitCode).toBe(1);
 
     consoleErrorSpy.mockRestore();
+  });
+
+  it('should print the full error when --verbose is set', () => {
+    const mockError = new Error('Audit command failed');
+    actionOptions = { output: 'output.html', verbose: true };
+    (execSync as jest.Mock).mockImplementationOnce(() => {
+      throw mockError;
+    });
+
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    main(['node', 'script.js', '--output', 'output.html', '--verbose']);
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(mockError);
+    expect(process.exitCode).toBe(1);
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('should leave the exit code untouched on success', () => {
+    (execSync as jest.Mock).mockReturnValue('{"mock": "data"}');
+    (generateHtml as jest.Mock).mockReturnValue('<html>Mock Report</html>');
+    jest.spyOn(console, 'time').mockImplementation(() => {});
+    jest.spyOn(console, 'timeEnd').mockImplementation(() => {});
+
+    main(['node', 'script.js', '--output', 'output.html']);
+
+    expect(process.exitCode).toBe(initialExitCode);
   });
 });

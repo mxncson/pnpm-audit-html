@@ -12,7 +12,6 @@
     "checkJs": true,
     "allowJs": true,
     "declaration": true,
-    "declarationMap": true,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "types": ["node", "jest"]
