@@ -18,7 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Only publish `dist/` and `templates/` to npm (`files` field). Previous releases shipped
   `src/`, test files, CI workflows and tooling configs.
 - Stop dumping the full error stack by default; use `--verbose` instead.
-- CI now runs `check-types` and `build` alongside lint and tests.
+- CI now runs `check-types` and `build` alongside lint and tests, and runs on pull
+  requests targeting `main` (it previously excluded `main` as a base branch, so PRs into
+  `main` had no checks of their own).
 - Releases are now driven by the `v*` git tag instead of any change to `package.json`,
   so editing `package.json` without a version bump no longer attempts a duplicate publish.
 - npm packages are published with provenance attestation.
