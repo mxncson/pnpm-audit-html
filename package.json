@@ -6,6 +6,11 @@
   "bin": {
     "pnpm-audit-html": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "templates",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc",
     "check-types": "tsc --noEmit",

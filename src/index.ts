@@ -47,6 +47,7 @@ export const main = (cliArgs: string[] = process.argv): void => {
     .version(version)
     .description('Generate HTML report from pnpm audit')
     .option('-o, --output <file>', 'Output HTML file', 'pnpm-audit-report.html')
+    .option('-v, --verbose', 'Print the full error stack on failure', false)
     .action((options) => {
       try {
         console.log('Running pnpm audit...');
@@ -58,10 +59,16 @@ export const main = (cliArgs: string[] = process.argv): void => {
         console.timeEnd('Audit report generation time');
         console.log(`Audit report generated: ${options.output}`);
       } catch (error) {
-        if (error instanceof Error) {
-          console.error('Failed to generate audit report:', error.message);
+        console.error(
+          'Failed to generate audit report:',
+          error instanceof Error ? error.message : error
+        );
+        if (options.verbose) {
+          console.error(error);
+        } else {
+          console.error('Re-run with --verbose for the full stack trace.');
         }
-        console.error('Full error:', error);
+        process.exitCode = 1;
       }
     });
 
@@ -71,6 +78,7 @@ export const main = (cliArgs: string[] = process.argv): void => {
     console.log('Examples:');
     console.log('  $ pnpm-audit-html --output report.html');
     console.log('  $ pnpm-audit-html -o custom-report.html');
+    console.log('  $ pnpm-audit-html --verbose');
   });
 
   program.parse(cliArgs);

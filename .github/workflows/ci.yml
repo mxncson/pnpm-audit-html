@@ -3,12 +3,8 @@ name: CI
 on:
   push:
     branches:
-      - '**'
-      - '!main'
+      - main
   pull_request:
-    branches:
-      - '**'
-      - '!main'
 
 jobs:
   build:
@@ -35,8 +31,14 @@ jobs:
       - name: Install dependencies with pnpm
         run: pnpm install --frozen-lockfile
 
+      - name: Check types
+        run: pnpm run check-types
+
       - name: Lint code
         run: pnpm run lint
+
+      - name: Build
+        run: pnpm run build
 
       - name: Run tests
         run: pnpm run test:coverage
