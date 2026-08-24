@@ -1,16 +1,13 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.2/dist/morph/bootstrap.min.css" crossorigin="anonymous" />
-
     <title>PNPM Audit Report</title>
     <meta name="description" content="<%= vulnerabilities.total %> overall vulnerabilities found." />
 
+    <style><%- css %></style>
     <style>
         .collapsible-content {
             max-height: 0;
@@ -68,11 +65,21 @@
             content: "•";
             position: absolute;
             left: 0;
-            color: black;
+            color: currentColor;
         }
     </style>
 </head>
 <body>
+    <%
+    const severityBadge = {
+        critical: 'danger',
+        high: 'warning',
+        moderate: 'info',
+        low: 'success',
+        info: 'secondary',
+    };
+    const badgeClass = (severity) => severityBadge[severity] || 'secondary';
+    %>
     <div class="container">
         <div class="row my-3">
             <div class="col-md text-center">
@@ -81,26 +88,21 @@
                     <%= advisories.length %> unique from <%= vulnerabilities.total %> overall vulnerabilities | <%= dependencies.total %> dependencies
                 </h3>
                 <div class="vulnerability-summary">
-                    <a href="#critical" class="badge bg-danger">Critical: <%= vulnerabilities.critical %></a>
-                    <a href="#high" class="badge bg-warning">High: <%= vulnerabilities.high %></a>
-                    <a href="#moderate" class="badge bg-info">Moderate: <%= vulnerabilities.moderate %></a>
-                    <a href="#low" class="badge bg-success">Low: <%= vulnerabilities.low %></a>
-                    <a href="#info" class="badge bg-secondary">Info: <%= vulnerabilities.info %></a>
+                    <a href="#critical" class="badge bg-<%= badgeClass('critical') %>">Critical: <%= vulnerabilities.critical %></a>
+                    <a href="#high" class="badge bg-<%= badgeClass('high') %>">High: <%= vulnerabilities.high %></a>
+                    <a href="#moderate" class="badge bg-<%= badgeClass('moderate') %>">Moderate: <%= vulnerabilities.moderate %></a>
+                    <a href="#low" class="badge bg-<%= badgeClass('low') %>">Low: <%= vulnerabilities.low %></a>
+                    <a href="#info" class="badge bg-<%= badgeClass('info') %>">Info: <%= vulnerabilities.info %></a>
                 </div>
             </div>
         </div>
         <div class="row">
-            <% advisories.forEach(function(advisory, index) {
-                advisory.findings.forEach(function(finding) { %>
-            <% if (index === 0 || (index > 0 && advisories[index-1].severity !== advisory.severity)) { %>
-            <div id="<%= advisory.severity %>" class="col-md-12"> <!-- Add an ID for the first occurrence of each severity -->
-            <% } else { %>
-            <div class="col-md-12">
-            <% } %>
+            <% advisories.forEach(function(advisory, index) { %>
+            <div class="col-md-12"<% if (index === 0 || advisories[index - 1].severity !== advisory.severity) { %> id="<%= advisory.severity %>"<% } %>>
                 <div class="card mb-3">
                     <div class="card-body p-4">
                         <h1 class="card-title h3">
-                            <span class="badge text-capitalize bg-<%= advisory.severity === 'critical' ? 'danger' : advisory.severity === 'high' ? 'warning' : advisory.severity === 'moderate' ? 'info' : 'success' %>">
+                            <span class="badge text-capitalize bg-<%= badgeClass(advisory.severity) %>">
                                 <%= advisory.severity %>
                             </span>
                             <%= advisory.title %>
@@ -108,21 +110,23 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <ul>
-                                    <li>Module: <a href="https://npmjs.com/package/<%= advisory.module_name %>" target="_blank" rel="noopener noreferrer"><%= advisory.module_name %></a></li>
-                                    <li>Installed version: <%= finding.version %></li>
-                                    <li>Vulnerable versions: <%= advisory.vulnerable_versions %></li>
-                                    <li>Patched in: <%= advisory.patched_versions %></li>
+                                    <li>Module: <a href="https://npmjs.com/package/<%= advisory.moduleName %>" target="_blank" rel="noopener noreferrer"><%= advisory.moduleName %></a></li>
+                                    <% if (advisory.installedVersions.length > 0) { %>
+                                    <li>Installed version<%= advisory.installedVersions.length > 1 ? 's' : '' %>: <%= advisory.installedVersions.join(', ') %></li>
+                                    <% } %>
+                                    <li>Vulnerable versions: <%= advisory.vulnerableVersions %></li>
+                                    <li>Patched in: <%= advisory.patchedVersions %></li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <ul>
                                     <% if (advisory.created) { %>
-                                    <li>Published: <%= new Date(advisory.created).toLocaleDateString() %></li>
+                                    <li>Published: <%= new Date(advisory.created).toISOString().slice(0, 10) %></li>
                                     <% } %>
-                                    <% if (advisory.cves && advisory.cves.length > 0) { %>
+                                    <% if (advisory.cves.length > 0) { %>
                                     <li>CVEs: <%= advisory.cves.join(', ') %></li>
                                     <% } %>
-                                    <% if (advisory.cwe && advisory.cwe.length > 0) { %>
+                                    <% if (advisory.cwe.length > 0) { %>
                                     <li>CWE: <%= advisory.cwe.join(', ') %></li>
                                     <% } %>
                                 </ul>
@@ -145,21 +149,19 @@
                                 References
                             </h3>
                             <div class="collapsible-content">
-                                <ul>
-                                    <%- advisory.references %>
-                                </ul>
+                                <%- advisory.references %>
                             </div>
                         </div>
                         <% } %>
 
-                        <% if (finding.paths && finding.paths.length > 0) { %>
+                        <% if (advisory.paths.length > 0) { %>
                         <div class="reasons">
                             <h3 class="collapsible-header" onclick="this.classList.toggle('active'); this.nextElementSibling.classList.toggle('active');">
                                 Reasons this module exists
                             </h3>
                             <div class="collapsible-content">
                                 <ul>
-                                    <% finding.paths.forEach(function(path) { %>
+                                    <% advisory.paths.forEach(function(path) { %>
                                     <li><code><%= path %></code></li>
                                     <% }) %>
                                 </ul>
@@ -175,12 +177,12 @@
                     </div>
                 </div>
             </div>
-            <% }); }); %>
+            <% }); %>
             <% if (advisories.length === 0) { %>
             <div class="col-md-12 alert alert-success">Congrats!!! No vulnerabilities have been found.</div>
             <% } %>
 
-            <h6 class="col-md-12 mb-3 pb-3 text-end">Report generated at <%= new Date().toLocaleString() %></h6>
+            <h6 class="col-md-12 mb-3 pb-3 text-end">Report generated at <%= new Date().toISOString() %></h6>
         </div>
     </div>
 </body>

@@ -1,0 +1,221 @@
+{
+  "actions": [],
+  "advisories": {
+    "101": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            ". > a@1.0.0"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.0.1",
+      "module_name": "lowmod",
+      "severity": "low",
+      "github_advisory_id": "GHSA-xxxx-yyyy",
+      "cves": [],
+      "access": "public",
+      "patched_versions": ">=1.0.1",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "updated": "2024-02-01T00:00:00.000Z",
+      "recommendation": "Upgrade to version 1.0.1 or later.",
+      "cwe": [
+        "CWE-200"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 101,
+      "references": "- [GHSA](https://github.com/advisories/GHSA-xxxx-yyyy)\n- [CVE](https://nvd.nist.gov/vuln/detail/CVE-2024-0001)",
+      "created": "2024-01-15T09:30:00.000Z",
+      "reported_by": null,
+      "title": "Low issue",
+      "npm_advisory_id": null,
+      "overview": "A **problem** exists.",
+      "url": "https://github.com/advisories/GHSA-xxxx-yyyy"
+    },
+    "102": {
+      "findings": [
+        {
+          "version": "2.0.0",
+          "paths": [
+            ". > critmod@2.0.0",
+            ". > x > critmod@2.0.0"
+          ]
+        },
+        {
+          "version": "2.1.0",
+          "paths": [
+            ". > y > critmod@2.1.0",
+            ". > critmod@2.0.0"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.0.1",
+      "module_name": "critmod",
+      "severity": "critical",
+      "github_advisory_id": "GHSA-xxxx-yyyy",
+      "cves": [
+        "CVE-2024-0001"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.0.1",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "updated": "2024-02-01T00:00:00.000Z",
+      "recommendation": "Upgrade to version 1.0.1 or later.",
+      "cwe": [
+        "CWE-89",
+        "CWE-564"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 102,
+      "references": "- [GHSA](https://github.com/advisories/GHSA-xxxx-yyyy)\n- [CVE](https://nvd.nist.gov/vuln/detail/CVE-2024-0001)",
+      "created": "2024-01-15T09:30:00.000Z",
+      "reported_by": null,
+      "title": "Critical issue",
+      "npm_advisory_id": null,
+      "overview": "A **problem** exists.",
+      "url": "https://github.com/advisories/GHSA-xxxx-yyyy"
+    },
+    "103": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            ". > a@1.0.0"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.0.1",
+      "module_name": "highmod",
+      "severity": "high",
+      "github_advisory_id": "GHSA-xxxx-yyyy",
+      "cves": [
+        "CVE-2024-0001"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.0.1",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "updated": "2024-02-01T00:00:00.000Z",
+      "recommendation": "Upgrade to version 1.0.1 or later.",
+      "cwe": [
+        "CWE-79"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 103,
+      "references": "- [GHSA](https://github.com/advisories/GHSA-xxxx-yyyy)\n- [CVE](https://nvd.nist.gov/vuln/detail/CVE-2024-0001)",
+      "created": "2024-01-15T09:30:00.000Z",
+      "reported_by": null,
+      "title": "High issue",
+      "npm_advisory_id": null,
+      "overview": "A **problem** exists.",
+      "url": "https://github.com/advisories/GHSA-xxxx-yyyy"
+    },
+    "104": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            ". > a@1.0.0"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.0.1",
+      "module_name": "modmod",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-xxxx-yyyy",
+      "cves": [
+        "CVE-2024-0001"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.0.1",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "updated": "2024-02-01T00:00:00.000Z",
+      "recommendation": "Upgrade to version 1.0.1 or later.",
+      "cwe": [
+        "CWE-79"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 104,
+      "references": "- [GHSA](https://github.com/advisories/GHSA-xxxx-yyyy)\n- [CVE](https://nvd.nist.gov/vuln/detail/CVE-2024-0001)",
+      "created": "2024-01-15T09:30:00.000Z",
+      "reported_by": null,
+      "title": "Moderate issue",
+      "npm_advisory_id": null,
+      "overview": "A **problem** exists.",
+      "url": "https://github.com/advisories/GHSA-xxxx-yyyy"
+    },
+    "105": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            ". > a@1.0.0"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.0.1",
+      "module_name": "highmod2",
+      "severity": "high",
+      "github_advisory_id": "GHSA-xxxx-yyyy",
+      "cves": [
+        "CVE-2024-0001"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.0.1",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "updated": "2024-02-01T00:00:00.000Z",
+      "recommendation": "Upgrade to version 1.0.1 or later.",
+      "cwe": [
+        "CWE-79"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 105,
+      "references": "- [GHSA](https://github.com/advisories/GHSA-xxxx-yyyy)\n- [CVE](https://nvd.nist.gov/vuln/detail/CVE-2024-0001)",
+      "created": "2024-01-15T09:30:00.000Z",
+      "reported_by": null,
+      "title": "Second high issue",
+      "npm_advisory_id": null,
+      "overview": "A **problem** exists.",
+      "url": "https://github.com/advisories/GHSA-xxxx-yyyy"
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 1,
+      "moderate": 1,
+      "high": 2,
+      "critical": 2,
+      "total": 999
+    },
+    "dependencies": 379,
+    "devDependencies": 10,
+    "optionalDependencies": 0,
+    "totalDependencies": 389
+  }
+}

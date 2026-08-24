@@ -8,12 +8,14 @@ Generate beautiful HTML reports from your pnpm audit results. This tool provides
 
 - **Easy to Use**: Simple CLI commands to generate reports.
 - **Beautiful Reports**: Generates well-structured and visually appealing HTML reports.
+- **Self-contained**: The theme is inlined, so reports render offline and survive as CI artifacts.
+- **CI-ready**: `--fail-on <severity>` gates a pipeline on the severities you care about.
 - **Customizable Output**: Choose your output file name and location.
 
 ## 📋 Requirements
 
 - **pnpm**: v8.0.0 or higher
-- **Node.js**: v14.15.0 or higher
+- **Node.js**: v20 or higher
 
 ## 📦 Installation
 
@@ -70,18 +72,41 @@ pnpm-audit-html --output security-report.html
 ### Available Options
 
 - `-o, --output <file>`: Specify the output HTML file (default: pnpm-audit-report.html).
+- `-f, --fail-on <severity>`: Exit with code 2 when vulnerabilities at or above this severity
+  are found. One of `info`, `low`, `moderate`, `high`, `critical`.
 - `-v, --verbose`: Print the full error stack when report generation fails.
 - `-V, --version`: Output the version number.
 - `-h, --help`: Display help for the command.
 
 ### Exit Codes
 
-- `0`: The report was generated successfully.
-- `1`: Report generation failed (audit could not run, output could not be parsed, or the
-  file could not be written). Re-run with `--verbose` to see the stack trace.
+- `0`: The report was generated and nothing reached the `--fail-on` threshold.
+- `1`: Report generation failed (audit could not run, output could not be parsed, the file
+  could not be written, or `--fail-on` got an unknown severity). Re-run with `--verbose`
+  to see the stack trace.
+- `2`: The report was generated and vulnerabilities at or above `--fail-on` were found.
 
-Note that a successful run exits `0` even when vulnerabilities are found — the report is
-still generated. Gating a pipeline on severity is not supported yet.
+Without `--fail-on`, a successful run always exits `0`, however many vulnerabilities the
+report contains. The two failure codes are distinct on purpose: `1` means the tool broke,
+`2` means the tool worked and your dependencies did not.
+
+### Gating CI
+
+```yaml
+- name: Audit dependencies
+  run: pnpm-audit-html --output audit.html --fail-on high
+
+- name: Upload the report
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: audit-report
+    path: audit.html
+```
+
+`if: always()` matters — on exit `2` the report is the thing you want to read, so upload it
+even though the step failed. The report is self-contained, so it renders straight from the
+downloaded artifact with no network access.
 
 ## 🤝 Contributing
 

@@ -1,0 +1,58 @@
+{
+  "actions": [],
+  "advisories": {
+    "301": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            ". > a@1.0.0"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.0.1",
+      "module_name": "evil",
+      "severity": "critical",
+      "github_advisory_id": "GHSA-xxxx-yyyy",
+      "cves": [
+        "CVE-2024-0001"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.0.1",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "updated": "2024-02-01T00:00:00.000Z",
+      "recommendation": "<script>alert('reco')</script> Upgrade.",
+      "cwe": [
+        "CWE-79"
+      ],
+      "found_by": null,
+      "deleted": null,
+      "id": 301,
+      "references": "- [ref](javascript:alert('ref'))\n- [ok](https://example.com/a)",
+      "created": "2024-01-15T09:30:00.000Z",
+      "reported_by": null,
+      "title": "Injected advisory <script>alert('title')</script>",
+      "npm_advisory_id": null,
+      "overview": "Intro text with <img src=x onerror=\"alert('inline')\"> and <b>inline</b> markup.\n\n<script>alert('overview')</script>\n\n<img src=x onerror=\"alert('img')\">\n\n[click me](javascript:alert('link'))\n\n<iframe src=\"https://evil.example\"></iframe>\n\n[safe link](https://example.com)",
+      "url": "https://github.com/advisories/GHSA-xxxx-yyyy"
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 1,
+      "total": 999
+    },
+    "dependencies": -3,
+    "devDependencies": 10,
+    "optionalDependencies": 0,
+    "totalDependencies": 7
+  }
+}

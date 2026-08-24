@@ -1,0 +1,56 @@
+{
+  "actions": [],
+  "advisories": {
+    "201": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            ". > a@1.0.0"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.0.1",
+      "module_name": "v11mod",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-xxxx-yyyy",
+      "cves": [
+        "CVE-2024-0001"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.0.1",
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+      },
+      "updated": "2024-02-01T00:00:00.000Z",
+      "recommendation": "Upgrade to version 1.0.1 or later.",
+      "cwe": "CWE-79, CWE-80",
+      "found_by": null,
+      "deleted": null,
+      "id": 201,
+      "references": null,
+      "created": "2024-01-15T09:30:00.000Z",
+      "reported_by": null,
+      "title": "V11 shaped advisory",
+      "npm_advisory_id": null,
+      "overview": null,
+      "url": "https://github.com/advisories/GHSA-xxxx-yyyy"
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 1,
+      "high": 0,
+      "critical": 0,
+      "total": 999
+    },
+    "dependencies": 32,
+    "devDependencies": 10,
+    "optionalDependencies": 0,
+    "totalDependencies": 42
+  }
+}
