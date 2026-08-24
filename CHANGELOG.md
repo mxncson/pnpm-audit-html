@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Refreshed every dependency to its newest CommonJS-compatible release: `marked` 14 -> 15,
+  `ejs` 3 -> 6, `commander` 12 -> 14, `jest` 29 -> 30, `eslint` 9 -> 10, `@types/node` 22 -> 24,
+  plus all remaining minors and patches. Report output is byte-identical.
+- CI installs with pnpm 10, matching the version that writes the lockfile.
+- `marked`, `commander` and `typescript` are deliberately held one major back: `marked` 16+ and
+  `commander` 15 are ESM-only, and `typescript-eslint` does not support TypeScript 7. Moving to
+  them requires converting the package to ESM.
+
+### Removed
+- `ts-node`, which nothing referenced.
+
+### Security
+- `pnpm.overrides` pins patched `brace-expansion` and `js-yaml` in the dev tree. `pnpm audit` on
+  this repo now reports zero advisories, down from eight; the production tree was already clean.
+
 ## [0.4.0] - 2026-08-24
 
 ### Added
